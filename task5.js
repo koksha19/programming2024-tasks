@@ -49,10 +49,19 @@ class MyEmitter extends EventEmitter {
     console.error(`Error encountered: ${error.message}`);
   });
 
+  ee.on("end", () => {
+    console.log("Processing ended");
+  });
+
   const generator = ee.randomNumberGenerator();
   const mappedGenerator = ee.asyncMap(generator, (num) => {
     return num * 2;
   });
+
+  const timeout = setTimeout(() => {
+    ee.emit("end");
+    process.exit(0);
+  }, 10000);
 
   try {
     for await (const mappedNum of mappedGenerator) {
