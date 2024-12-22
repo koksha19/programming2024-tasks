@@ -58,7 +58,7 @@ class MyEmitter extends EventEmitter {
     return num * 2;
   });
 
-  const timeout = setTimeout(() => {
+  setTimeout(() => {
     ee.emit("end");
     process.exit(0);
   }, 10000);
