@@ -15,7 +15,7 @@ class MyEmitter extends EventEmitter {
         this.emit("data", randomNum);
         yield randomNum;
       } catch (error) {
-        console.error(`Error in generator: ${error.message}`);
+        this.emit("error", error);
       }
     }
   }
@@ -27,7 +27,7 @@ class MyEmitter extends EventEmitter {
         this.emit("mapped", mappedNum);
         yield mappedNum;
       } catch (error) {
-        console.error(`Error in asyncMap: ${error.message}`);
+        this.emit("error", error);
       }
     }
   }
@@ -35,9 +35,18 @@ class MyEmitter extends EventEmitter {
 
 (async () => {
   const ee = new MyEmitter();
+  let iterationCount = 1;
 
   ee.on("data", (num) => {
     console.log(`Generated number: ${num}`);
+  });
+
+  ee.on("mapped", (num) => {
+    console.log(`Mapped number: ${num}`);
+  });
+
+  ee.on("error", (error) => {
+    console.error(`Error encountered: ${error.message}`);
   });
 
   const generator = ee.randomNumberGenerator();
@@ -47,6 +56,8 @@ class MyEmitter extends EventEmitter {
 
   try {
     for await (const mappedNum of mappedGenerator) {
+      console.log(`Iteration number ${iterationCount} finished`);
+      iterationCount++;
     }
   } catch (error) {
     console.error(`Error in main loop: ${error.message}`);
