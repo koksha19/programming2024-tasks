@@ -1,14 +1,44 @@
+"use strict";
+
 async function* randomNumberGenerator() {
   while (true) {
-    const randomNum = Math.random();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    yield randomNum;
+    try {
+      const randomNum = Math.random();
+      console.log("Random number: ", randomNum);
+      if (randomNum > 0.9)
+        return Promise.reject(
+          new Error(`Random number ${randomNum} is too big`),
+        );
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      yield randomNum;
+    } catch (error) {
+      console.error(`Error in generator: ${error.message}`);
+    }
+  }
+}
+
+async function* asyncMap(iterator, func) {
+  for await (const num of iterator) {
+    try {
+      const mappedNum = func(num);
+      yield mappedNum;
+    } catch (error) {
+      console.error(`Error in asyncMap: ${error.message}`);
+    }
   }
 }
 
 (async () => {
   const generator = randomNumberGenerator();
-  for await (const num of generator) {
-    console.log(`Generated number: ${num}`);
+  const mappedGenerator = asyncMap(generator, (num) => {
+    return num * 2;
+  });
+
+  try {
+    for await (const mappedNum of mappedGenerator) {
+      console.log(`Mapped number: ${mappedNum}`);
+    }
+  } catch (error) {
+    console.error(`Error in main loop: ${error.message}`);
   }
 })();
