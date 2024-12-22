@@ -26,6 +26,8 @@ asyncMap([4, 62, 242, "sdfljad"], (data) => {
       }
     }, 1000);
   });
-})
-  .then((result) => console.log("Case 1:", result))
-  .catch((err) => console.error("Case 1 Error:", err));
+}).then(
+  (result) => console.log("Case 1:", result),
+  (err) => console.error("Case 1 Error:", err),
+);
+//.catch();
