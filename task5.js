@@ -1,42 +1,52 @@
 "use strict";
 
-async function* randomNumberGenerator() {
-  while (true) {
-    try {
-      const randomNum = Math.random();
-      console.log("Random number: ", randomNum);
-      if (randomNum > 0.9)
-        return Promise.reject(
-          new Error(`Random number ${randomNum} is too big`),
-        );
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      yield randomNum;
-    } catch (error) {
-      console.error(`Error in generator: ${error.message}`);
+const EventEmitter = require("events");
+
+class MyEmitter extends EventEmitter {
+  async *randomNumberGenerator() {
+    while (true) {
+      try {
+        const randomNum = Math.random();
+        if (randomNum > 0.9)
+          return Promise.reject(
+            new Error(`Random number ${randomNum} is too big`),
+          );
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        this.emit("data", randomNum);
+        yield randomNum;
+      } catch (error) {
+        console.error(`Error in generator: ${error.message}`);
+      }
     }
   }
-}
 
-async function* asyncMap(iterator, func) {
-  for await (const num of iterator) {
-    try {
-      const mappedNum = func(num);
-      yield mappedNum;
-    } catch (error) {
-      console.error(`Error in asyncMap: ${error.message}`);
+  async *asyncMap(iterator, func) {
+    for await (const num of iterator) {
+      try {
+        const mappedNum = func(num);
+        this.emit("mapped", mappedNum);
+        yield mappedNum;
+      } catch (error) {
+        console.error(`Error in asyncMap: ${error.message}`);
+      }
     }
   }
 }
 
 (async () => {
-  const generator = randomNumberGenerator();
-  const mappedGenerator = asyncMap(generator, (num) => {
+  const ee = new MyEmitter();
+
+  ee.on("data", (num) => {
+    console.log(`Generated number: ${num}`);
+  });
+
+  const generator = ee.randomNumberGenerator();
+  const mappedGenerator = ee.asyncMap(generator, (num) => {
     return num * 2;
   });
 
   try {
     for await (const mappedNum of mappedGenerator) {
-      console.log(`Mapped number: ${mappedNum}`);
     }
   } catch (error) {
     console.error(`Error in main loop: ${error.message}`);
