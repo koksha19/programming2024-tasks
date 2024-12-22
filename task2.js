@@ -6,8 +6,8 @@ const asyncMap = (array, func) => {
   array.forEach((item, index) => {
     promiseChain = promiseChain.then((results) =>
       func(item).then((result) => {
+        console.log(item, index);
         results[index] = result;
-        if (item === 242) throw new Error("Bebra");
         return results;
       }),
     );
@@ -16,10 +16,14 @@ const asyncMap = (array, func) => {
   return promiseChain;
 };
 
-asyncMap([4, 62, 242], (data) => {
-  return new Promise((resolve) => {
+asyncMap([4, 62, 242, "sdfljad"], (data) => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve(data * 2);
+      if (typeof data === "string") {
+        reject(new Error("Wrong type"));
+      } else {
+        resolve(data * 2);
+      }
     }, 1000);
   });
 })
