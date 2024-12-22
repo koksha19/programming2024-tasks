@@ -1,25 +1,49 @@
 async function* randomNumberGenerator() {
   while (true) {
-    const randomNum = Math.floor(Math.random() * 10);
-    console.log("Random number", randomNum);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    yield randomNum;
+    try {
+      const randomNum = Math.random();
+      console.log("Random number: ", randomNum);
+      if (randomNum > 0.9)
+        return Promise.reject(
+          new Error(`Random number ${randomNum} is too big`),
+        );
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      yield randomNum;
+    } catch (error) {
+      console.error(`Error in generator: ${error.message}`);
+    }
   }
 }
 
-async function* asyncMap(iterator, transformFn) {
+async function* asyncMap(iterator, func) {
   for await (const num of iterator) {
-    yield transformFn(num);
+    try {
+      const mappedNum = func(num);
+      yield mappedNum;
+    } catch (error) {
+      console.error(`Error in asyncMap: ${error.message}`);
+    }
   }
 }
 
 async function main() {
   const generator = randomNumberGenerator();
 
-  const mappedGenerator = asyncMap(generator, (num) => num * num);
+  const mappedGenerator = asyncMap(generator, (num) => {
+    return num * 2;
+  });
 
-  for await (const mappedNum of mappedGenerator) {
-    console.log(`Mapped number: ${mappedNum}`);
+  setTimeout(() => {
+    console.log("Stopping the process after 10 seconds.");
+    process.exit(0);
+  }, 10000);
+
+  try {
+    for await (const mappedNum of mappedGenerator) {
+      console.log(`Mapped number: ${mappedNum.toFixed(4)}`);
+    }
+  } catch (error) {
+    console.error(`Error in main loop: ${error.message}`);
   }
 }
 
