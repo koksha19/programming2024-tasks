@@ -16,18 +16,16 @@ const asyncMap = (array, func) => {
   return promiseChain;
 };
 
-asyncMap([4, 62, 242, "sdfljad"], (data) => {
+asyncMap([1, 3, 10], (data) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (typeof data === "string") {
+      if (typeof data !== "number") {
         reject(new Error("Wrong type"));
       } else {
         resolve(data * 2);
       }
     }, 1000);
   });
-}).then(
-  (result) => console.log("Case 1:", result),
-  (err) => console.error("Case 1 Error:", err),
-);
-//.catch();
+})
+  .then((result) => console.log("Case 1:", result))
+  .catch((err) => console.error("Case 1 Error:", err));
