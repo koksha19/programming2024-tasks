@@ -1,3 +1,5 @@
+"use strict";
+
 async function* randomNumberGenerator() {
   while (true) {
     try {
@@ -40,7 +42,7 @@ async function main() {
 
   try {
     for await (const mappedNum of mappedGenerator) {
-      console.log(`Mapped number: ${mappedNum.toFixed(4)}`);
+      console.log(`Mapped number: ${mappedNum}`);
     }
   } catch (error) {
     console.error(`Error in main loop: ${error.message}`);
