@@ -1,6 +1,6 @@
 "use strict";
 
-const asyncMap = async (array, callback, signal) => {
+const asyncMap = async (array, transform, signal) => {
   const newArray = [];
   for (let i = 0; i < array.length; i++) {
     if (signal.aborted) {
@@ -9,7 +9,7 @@ const asyncMap = async (array, callback, signal) => {
     }
 
     try {
-      const newElement = await callback(array[i]);
+      const newElement = await transform(array[i]);
       newArray.push(newElement);
     } catch (err) {
       console.error(err);
@@ -29,7 +29,7 @@ const asyncMap = async (array, callback, signal) => {
 
   try {
     const results = await asyncMap(
-      [3, 9, 6, 15, "bobr", 24, 45, 3, 34, 11, 23],
+      [3, 9, 6, 15, 24, 45, 3, 34, 11, 23],
       (value) => {
         return new Promise((resolve, reject) => {
           setTimeout(() => {

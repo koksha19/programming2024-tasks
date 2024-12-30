@@ -1,11 +1,11 @@
 "use strict";
 
-const asyncMap = (array, func) => {
+const asyncMap = (array, transform) => {
   let promiseChain = Promise.resolve([]);
 
   array.forEach((item, index) => {
     promiseChain = promiseChain.then((results) =>
-      func(item).then((result) => {
+      transform(item).then((result) => {
         console.log(item, index);
         results[index] = result;
         return results;
@@ -16,7 +16,7 @@ const asyncMap = (array, func) => {
   return promiseChain;
 };
 
-asyncMap([1, 3, 10], (data) => {
+asyncMap([1, 3, 'lsdjf', 10], (data) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (typeof data !== "number") {

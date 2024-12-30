@@ -17,11 +17,11 @@ async function* randomNumberGenerator() {
   }
 }
 
-async function* asyncMap(iterator, func) {
+async function* asyncMap(iterator, transform) {
   for await (const num of iterator) {
     try {
-      const mappedNum = func(num);
-      yield mappedNum;
+      const mappedNum = transform(num);
+      yield  mappedNum;
     } catch (error) {
       console.error(`Error in asyncMap: ${error.message}`);
     }

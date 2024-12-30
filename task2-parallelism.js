@@ -1,39 +1,43 @@
 "use strict";
 
-const asyncMap = async (array, func) => {
+const asyncMap = async (array, transform) => {
   const promises = [];
 
   for (let i = 0; i < array.length; i++) {
     promises.push(
-      func(array[i])
+      transform(array[i])
         .then((result) => ({ stat: "fulfilled", index: i, result }))
         .catch((reason) => ({ stat: "rejected", index: i, reason })),
     );
   }
 
-  const results = await Promise.allSettled(promises);
+  try {
+    const results = await Promise.allSettled(promises);
 
-  const errors = results
-    .filter((result) => result.value.stat === "rejected")
-    .map((result) => result.value.reason);
+    const errors = results
+        .filter((result) => result.value.stat === "rejected")
+        .map((result) => result.value.reason);
 
-  if (errors.length !== 0) {
-    throw new AggregateError(errors, "One or more operations failed");
-  }
-
-  const finalResults = [];
-  for (let i = 0; i < results.length; i++) {
-    if (results[i].status === "fulfilled") {
-      finalResults.push(results[i].value.result);
+    if (errors.length !== 0) {
+      throw new AggregateError(errors, "One or more operations failed");
     }
-  }
 
-  return finalResults;
+    const finalResults = [];
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].status === "fulfilled") {
+        finalResults.push(results[i].value.result);
+      }
+    }
+
+    return finalResults;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 (async () => {
   try {
-    const result = await asyncMap([4, 32, 242], async (data) => {
+    const result = await asyncMap([4, 32, 'sljs', 62, 242], async (data) => {
       if (typeof data !== "number") throw new Error("Wrong type");
       if (data === 62) throw new Error("error");
       return new Promise((resolve) =>
