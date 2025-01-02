@@ -6,11 +6,11 @@ const asyncMap = (array, callback, result) => {
   let errorOccurred = false;
 
   for (let i = 0; i < array.length; i++) {
-    if (errorOccurred) break;
     callback(array[i], (err, newValue) => {
-      if (err && !errorOccurred) {
+      if (errorOccurred) return;
+      if (err) {
         errorOccurred = true;
-        result(err, null);
+        return void result(err, null);
       }
       newArray.push(newValue);
       callbackCount++;
@@ -22,7 +22,7 @@ const asyncMap = (array, callback, result) => {
 };
 
 asyncMap(
-  [4, 62, 'sdfdf', 242, 'sfsf'],
+  [4, 62, 'sdffjwdf', 242, 'sfsf'],
   (data, cb) => {
     setTimeout(() => {
       if (typeof data !== "number") {
